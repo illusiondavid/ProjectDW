@@ -8,7 +8,7 @@ public class DWGame : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" ,"MultiplayerSessions",});
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" ,"MultiplayerSessions","UMG","Slate","DeveloperSettings","OnlineSubsystem","OnlineSubsystemSteam"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
