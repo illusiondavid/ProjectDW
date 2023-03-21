@@ -111,5 +111,5 @@ private:
 	//上一次网络会话查找结果
 	TSharedPtr<FOnlineSessionSearch> NetSessionSearch;
 	
-	bool bCreateNetSessionOnDestroy; 
+	bool bCreateNetSessionOnDestroy;  
 };

@@ -41,8 +41,18 @@ public:
 protected:
 	
 	virtual void BeginDestroy() override;
+
+	virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld) override;
+
+	virtual bool Initialize() override;
 	
 private:
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* CreateRoomButton;
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* JoinRoomButton;
 	
 	void DestroyMenuWidget();
 

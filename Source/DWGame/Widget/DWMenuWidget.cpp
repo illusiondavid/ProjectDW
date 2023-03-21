@@ -9,6 +9,25 @@
 
 DEFINE_LOG_CATEGORY(LogDWMenuWidget);
 
+bool UDWMenuWidget::Initialize()
+{
+	if(!Super::Initialize())
+	{
+		return false;
+	}
+	
+	if (CreateRoomButton)
+	{
+		CreateRoomButton->OnClicked.AddDynamic(this, &ThisClass::OnCreateRoomButtonClicked);
+	}
+	if (JoinRoomButton)
+	{
+		JoinRoomButton->OnClicked.AddDynamic(this, &ThisClass::OnJoinRoomButtonClicked);
+	}
+	return true;
+}
+
+
 void UDWMenuWidget::SetMenu()
 {
 
@@ -60,30 +79,30 @@ void UDWMenuWidget::BeginDestroy()
 
 void UDWMenuWidget::OnCreateRoomButtonClicked()
 {
+	CreateRoomButton->SetIsEnabled(false);
 	if(!NetSubsystem)
 	{
 		UE_LOG(LogDWMenuWidget, Error, TEXT("NetSubsystem is null!"));
 		return;
 	}
-
-	//界面销毁时重置输入模式
+	/*//界面销毁时重置输入模式
 	if(UWorld* World = GetWorld())
 	{
-		if(APlayerController* PlayerController = /*World->GetFirstPlayerController()*/GetOwningPlayer())
+		if(APlayerController* PlayerController = /*World->GetFirstPlayerController()#1#GetOwningPlayer())
 		{
 			FInputModeGameOnly InputModeGameOnly;
 			PlayerController->SetInputMode(InputModeGameOnly);
 			PlayerController->SetShowMouseCursor(false);
 		}
 	}
-	RemoveFromParent();
-	
+	RemoveFromParent();*/	
 	NetSubsystem->OpenLobby();
 }
 
 
 void UDWMenuWidget::OnJoinRoomButtonClicked()
 {
+	JoinRoomButton->SetIsEnabled(false);
 	if(!NetSubsystem)
 	{
 		return;
@@ -99,6 +118,7 @@ void UDWMenuWidget::OnCreateDWSession(bool bSuccessful)
 		{
 			GEngine->AddOnScreenDebugMessage(-1,15.f,FColor::Red,FString::Printf(TEXT("Create Session fail")));
 		}
+		CreateRoomButton->SetIsEnabled(true);
 		return;
 	}
 	if(GEngine)
@@ -126,8 +146,9 @@ void UDWMenuWidget::OnStartDWSession(bool bSuccessful)
 
 void UDWMenuWidget::OnFindDWSession(const TArray<FOnlineSessionSearchResult>& DWSessionSearchResults, bool bSuccessful)
 {
-	if(!NetSubsystem)
+	if(!NetSubsystem || DWSessionSearchResults.Num()==0)
 	{
+		JoinRoomButton->SetIsEnabled(true);
 		return;
 	}
 	for(auto& SearchResult : DWSessionSearchResults )
@@ -181,3 +202,21 @@ void UDWMenuWidget::OnDestroyDWSession(bool bSuccessful)
 void UDWMenuWidget::DestroyMenuWidget()
 {
 }
+
+void UDWMenuWidget::OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld)
+{
+	RemoveFromParent();
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		APlayerController* PlayerController = World->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			FInputModeGameOnly InputModeData;
+			PlayerController->SetInputMode(InputModeData);
+			PlayerController->SetShowMouseCursor(false);
+		}
+	}
+	Super::OnLevelRemovedFromWorld(InLevel, InWorld);
+}
+
